@@ -1,0 +1,6 @@
+ms5.log
+env.sh
+*.pem
+__pycache__/
+transporte-ms3-calificaciones/
+
