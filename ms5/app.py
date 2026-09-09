@@ -61,3 +61,52 @@ def rating_por_distrito():
         ORDER BY rating_promedio DESC
     """
     return {"items": consultar(sql)}
+
+
+@app.get(f"{PREFIX}/ingresos/por-hora-distrito")
+def ingresos_por_hora_distrito(distrito: str | None = None):
+    filtro = f"AND v.distrito_origen = '{distrito}'" if distrito else ""
+    sql = f"""
+        SELECT v.distrito_origen AS distrito,
+               hour(from_iso8601_timestamp(v.iniciado_en)) AS hora,
+               count(*)                    AS viajes,
+               round(avg(v.monto_total),2) AS ingreso_promedio,
+               round(sum(v.monto_total),2) AS ingreso_total
+        FROM viajes v
+        WHERE v.estado = 'finalizado' {filtro}
+        GROUP BY v.distrito_origen, hour(from_iso8601_timestamp(v.iniciado_en))
+        ORDER BY v.distrito_origen, hora
+    """
+    return {"items": consultar(sql)}
+
+
+@app.get(f"{PREFIX}/conductores/rating-por-antiguedad")
+def rating_por_antiguedad():
+    sql = """
+        SELECT date_diff('year', from_iso8601_date(c.fecha_ingreso), current_date) AS anios,
+               count(DISTINCT c.id)         AS conductores,
+               round(avg(cal.rating),2)     AS rating_promedio,
+               round(avg(v.monto_total),2)  AS ticket_promedio
+        FROM conductores c
+        JOIN viajes v           ON v.conductor_id = c.id
+        JOIN calificaciones cal ON cal.viaje_id   = v.id
+        WHERE v.estado = 'finalizado'
+        GROUP BY 1 ORDER BY 1
+    """
+    return {"items": consultar(sql)}
+
+
+@app.get(f"{PREFIX}/rutas/top-distritos")
+def top_distritos(minimo: int = 50):
+    sql = f"""
+        SELECT v.distrito_origen, v.distrito_destino,
+               count(*)                     AS viajes,
+               round(avg(v.distancia_km),2) AS km_promedio,
+               round(avg(cal.rating),2)     AS rating_promedio
+        FROM viajes v
+        LEFT JOIN calificaciones cal ON cal.viaje_id = v.id
+        WHERE v.estado = 'finalizado'
+        GROUP BY 1,2 HAVING count(*) > {minimo}
+        ORDER BY viajes DESC
+    """
+    return {"items": consultar(sql)}
