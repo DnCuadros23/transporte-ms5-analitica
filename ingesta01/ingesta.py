@@ -19,7 +19,7 @@ for tabla, columnas in TABLAS.items():
     cur = cn.cursor()
     cur.execute(f"SELECT {', '.join(columnas)} FROM {tabla} ORDER BY id")
     buf = io.StringIO()
-    w = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
+    w = csv.writer(buf, quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
     w.writerow(columnas)
     n = 0
     for fila in cur:

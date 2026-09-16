@@ -6,7 +6,7 @@ services:
       POSTGRES_DB: usuarios_db
       POSTGRES_USER: app_ms1
       POSTGRES_PASSWORD: local
-    ports: ["127.0.0.1:5432:5432"]
+    ports: ["5432:5432"]
     volumes:
       - pg:/var/lib/postgresql/data
 
@@ -16,24 +16,10 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: local
-    ports: ["127.0.0.1:27017:27017"]
+    ports: ["27017:27017"]
     volumes:
       - mg:/data/db
-
-  mysql:
-    image: mysql:8
-    container_name: dev_mysql
-    environment:
-      MYSQL_DATABASE: viajes_db
-      MYSQL_USER: app_ms2
-      MYSQL_PASSWORD: local
-      MYSQL_ROOT_PASSWORD: local
-    command: --local-infile=1
-    ports: ["127.0.0.1:3306:3306"]
-    volumes:
-      - my:/var/lib/mysql
 
 volumes:
   pg:
   mg:
-  my:

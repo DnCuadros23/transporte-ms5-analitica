@@ -18,7 +18,7 @@ for tabla in TABLAS:
     cur.execute(f"SELECT * FROM {tabla} ORDER BY id")   # 100% de los registros
     columnas = [d[0] for d in cur.description]
     buf = io.StringIO()
-    w = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
+    w = csv.writer(buf, quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
     w.writerow(columnas)
     n = 0
     for fila in cur:

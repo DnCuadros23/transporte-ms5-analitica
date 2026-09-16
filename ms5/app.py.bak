@@ -68,13 +68,13 @@ def ingresos_por_hora_distrito(distrito: str | None = None):
     filtro = f"AND v.distrito_origen = '{distrito}'" if distrito else ""
     sql = f"""
         SELECT v.distrito_origen AS distrito,
-               hour(CAST(v.iniciado_en AS timestamp)) AS hora,
+               hour(from_iso8601_timestamp(v.iniciado_en)) AS hora,
                count(*)                    AS viajes,
                round(avg(v.monto_total),2) AS ingreso_promedio,
                round(sum(v.monto_total),2) AS ingreso_total
         FROM viajes v
         WHERE v.estado = 'finalizado' {filtro}
-        GROUP BY v.distrito_origen, hour(CAST(v.iniciado_en AS timestamp))
+        GROUP BY v.distrito_origen, hour(from_iso8601_timestamp(v.iniciado_en))
         ORDER BY v.distrito_origen, hora
     """
     return {"items": consultar(sql)}
